@@ -1,0 +1,18 @@
+bin/
+obj/
+.vs/
+*.user
+publish/
+*.zip
+
+# the app downloads these itself (ToolsService)
+yt-dlp.exe
+ffmpeg.exe
+ffprobe.exe
+*.bin
+
+# local helpers
+fix_icon.py
+app_fixed.ico
+.claude/
+*.log

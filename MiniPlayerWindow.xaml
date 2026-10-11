@@ -1,0 +1,133 @@
+<Window x:Class="SoundPanel.MiniPlayerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ctl="clr-namespace:SoundPanel.Controls"
+        Title="1Flow SoundPanel Mini"
+        Width="480" Height="170"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ResizeMode="NoResize" ShowInTaskbar="False" Topmost="True" ShowActivated="False"
+        FontFamily="Segoe UI Variable Text, Segoe UI, Sylfaen"
+        Foreground="{StaticResource TextPrimary}"
+        UseLayoutRounding="True" SnapsToDevicePixels="True">
+
+    <Window.Resources>
+        <Style x:Key="MiniPlayPause" TargetType="Path">
+            <Setter Property="Data" Value="{StaticResource IconPlay}" />
+            <Setter Property="Fill" Value="White" />
+            <Setter Property="Width" Value="16" />
+            <Setter Property="Height" Value="16" />
+            <Setter Property="Stretch" Value="Uniform" />
+            <Setter Property="Margin" Value="4,0,0,0" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                    <Setter Property="Data" Value="{StaticResource IconPause}" />
+                    <Setter Property="Margin" Value="0" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Border x:Name="Card" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,28,28"
+                Width="108" Height="108" CornerRadius="28" ClipToBounds="True"
+                BorderThickness="1" BorderBrush="#33FFFFFF">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#F0231C4A" Offset="0" />
+                    <GradientStop Color="#F00D1426" Offset="1" />
+                </LinearGradientBrush>
+            </Border.Background>
+            <Border.Effect>
+                <DropShadowEffect Color="{DynamicResource AccentColorA}" BlurRadius="28" ShadowDepth="0" Opacity="0.45" />
+            </Border.Effect>
+
+            <Grid Width="420" HorizontalAlignment="Right">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="312" />
+                    <ColumnDefinition Width="108" />
+                </Grid.ColumnDefinitions>
+
+                <!-- controls (revealed while the card grows to the left) -->
+                <Grid x:Name="Controls" Grid.Column="0" Margin="18,10,6,10" Opacity="0" IsHitTestVisible="False">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="22" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="24" />
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock VerticalAlignment="Center" FontSize="13" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextPrimary}"
+                                   Text="{Binding NowPlayingTitle}" TextTrimming="CharacterEllipsis"
+                                   ToolTip="{Binding NowPlayingTitle}" />
+                        <Button Grid.Column="1" Width="26" Height="22" Style="{StaticResource IconButton}"
+                                ToolTip="აპლიკაციის გახსნა" Click="Restore_Click">
+                            <Path Data="{StaticResource IconMaximize}" Stroke="{StaticResource TextSecondary}"
+                                  StrokeThickness="1.6" Width="10" Height="10" Stretch="Uniform" StrokeLineJoin="Round" />
+                        </Button>
+                    </Grid>
+
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <ToggleButton Width="34" Height="34" Margin="0,0,4,0" Style="{StaticResource ToggleIconButton}"
+                                      IsChecked="{Binding Shuffle, Mode=TwoWay}" ToolTip="არეულად დაკვრა">
+                            <Path Data="{StaticResource IconShuffle}"
+                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ToggleButton}}"
+                                  StrokeThickness="1.8" StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                  Width="16" Height="16" Stretch="Uniform" />
+                        </ToggleButton>
+                        <Button Width="34" Height="34" Style="{StaticResource IconButton}" Click="Prev_Click">
+                            <Path Data="{StaticResource IconPrev}" Fill="{StaticResource TextPrimary}" Width="16" Height="16" Stretch="Uniform" />
+                        </Button>
+                        <Button Width="40" Height="40" Margin="8,0" Style="{StaticResource PlayButton}" Click="PlayPause_Click">
+                            <Path Style="{StaticResource MiniPlayPause}" />
+                        </Button>
+                        <Button Width="34" Height="34" Style="{StaticResource IconButton}" Click="Next_Click">
+                            <Path Data="{StaticResource IconNext}" Fill="{StaticResource TextPrimary}" Width="16" Height="16" Stretch="Uniform" />
+                        </Button>
+                        <ToggleButton Width="34" Height="34" Margin="4,0,0,0" Style="{StaticResource ToggleIconButton}"
+                                      IsChecked="{Binding Repeat, Mode=TwoWay}" ToolTip="სიის გამეორება">
+                            <Path Data="{StaticResource IconRepeat}"
+                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ToggleButton}}"
+                                  StrokeThickness="1.8" StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                  Width="16" Height="16" Stretch="Uniform" />
+                        </ToggleButton>
+                    </StackPanel>
+
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="38" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="38" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock FontSize="10" VerticalAlignment="Center" Foreground="{StaticResource TextSecondary}"
+                                   Text="{Binding PositionText}" />
+                        <ctl:WaveformSeekBar Grid.Column="1" Height="22"
+                                             Peaks="{Binding Peaks}"
+                                             Duration="{Binding DurationSeconds}"
+                                             Position="{Binding PositionSeconds, Mode=OneWay}"
+                                             SeekStarted="Waveform_SeekStarted"
+                                             SeekPreview="Waveform_SeekPreview"
+                                             SeekCommitted="Waveform_SeekCommitted" />
+                        <TextBlock Grid.Column="2" FontSize="10" VerticalAlignment="Center" HorizontalAlignment="Right"
+                                   Foreground="{StaticResource TextSecondary}" Text="{Binding DurationText}" />
+                    </Grid>
+                </Grid>
+
+                <!-- robot -->
+                <Border Grid.Column="1" Background="Transparent" Cursor="Hand"
+                        ToolTip="დააჭირე — გახსნა / დაკეცვა"
+                        MouseLeftButtonUp="Robot_MouseLeftButtonUp">
+                    <ctl:RobotFace x:Name="MiniRobot" Margin="6"
+                                   IsPlaying="{Binding IsPlaying, Mode=OneWay}"
+                                   Peaks="{Binding Peaks, Mode=OneWay}"
+                                   Position="{Binding PositionSeconds, Mode=OneWay}"
+                                   Duration="{Binding DurationSeconds, Mode=OneWay}" />
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
